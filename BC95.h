@@ -13,9 +13,7 @@ This software is released under the MIT License.
 #include <Arduino.h>
 #include <IPAddress.h>
 
-#define DEBUG
-
-#ifdef DEBUG
+#if BC95_DEBUG == 1
 #define ECHO_DEBUG
 #define LOG_DEBUG
 #endif

@@ -13,9 +13,7 @@ class NTPClient {
     BC95UDP*          _udp;
     bool          _udpSetup       = false;
 
-    const char*   _poolServerName = "pool.ntp.org"; // Default time server pool.ntp.org
-//    const char*   _poolServerName = "124.109.2.169"; // Default time server pool.ntp.org
-//    IPAddress       _poolServerName = IPAddress(124,109,2,169);
+    const char*   _poolServerName = "pool.ntp.org";
     int           _port           = NTP_DEFAULT_LOCAL_PORT;
     long          _timeOffset     = 0;
 
