@@ -12,6 +12,11 @@ This software is released under the MIT License.
 #include "BC95.h"
 #include "BC95Udp.h"
 
+#if BC95UDP_SHARE_GLOBAL_BUFFER != 1
+uint8_t pbuffer[MAX_UDP_PAYLOAD_SIZE];
+uint16_t pbufferlen;
+#endif
+
 BC95UDP::BC95UDP() {
     _bc95 = &BC95;
     pbufferlen = 0;
@@ -27,11 +32,14 @@ void BC95UDP::stop() {
 
 int BC95UDP::beginPacket(const char *host, uint16_t port) {
     int ret = 0;
-    DNSClient dns;
+    DNSClient *dns;
     IPAddress remote_addr;
 
-    dns.begin(DEFAULT_DNS_SERVER);
-    ret = dns.getHostByName(host, remote_addr);
+    dns = new DNSClient();
+    dns->begin(DEFAULT_DNS_SERVER);
+    ret = dns->getHostByName(host, remote_addr);
+    delete dns;
+    
     if (ret == 1) {
         return beginPacket(remote_addr, port);
     }

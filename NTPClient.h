@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Arduino.h"
-
-#include <BC95Udp.h>
+#include <Arduino.h>
+#include "BC95Udp.h"
 
 #define SEVENZYYEARS 2208988800UL
 #define NTP_PACKET_SIZE 48

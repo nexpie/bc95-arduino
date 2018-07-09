@@ -46,8 +46,10 @@ private:
     uint16_t dport;
     SOCKD *socket;
     uint8_t *pktcur;
+    #if BC95UDP_SHARE_GLOBAL_BUFFER == 1
     uint8_t pbuffer[MAX_UDP_PAYLOAD_SIZE];
     uint16_t pbufferlen;
+    #endif
 };
 
 #endif
