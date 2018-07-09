@@ -13,7 +13,7 @@ This software is released under the MIT License.
 #include "BC95Udp.h"
 
 #if BC95UDP_SHARE_GLOBAL_BUFFER != 1
-uint8_t pbuffer[MAX_UDP_PAYLOAD_SIZE];
+uint8_t pbuffer[BC95UDP_MAX_PAYLOAD_SIZE];
 uint16_t pbufferlen;
 #endif
 
@@ -36,10 +36,10 @@ int BC95UDP::beginPacket(const char *host, uint16_t port) {
     IPAddress remote_addr;
 
     dns = new DNSClient();
-    dns->begin(DEFAULT_DNS_SERVER);
+    dns->begin();
     ret = dns->getHostByName(host, remote_addr);
     delete dns;
-    
+
     if (ret == 1) {
         return beginPacket(remote_addr, port);
     }
@@ -54,7 +54,7 @@ int BC95UDP::beginPacket(IPAddress ip, uint16_t port) {
 }
 
 size_t BC95UDP::write(const uint8_t *buffer, size_t size) {
-    if (pbufferlen + size <= MAX_UDP_PAYLOAD_SIZE) {
+    if (pbufferlen + size <= BC95UDP_MAX_PAYLOAD_SIZE) {
         memcpy(pbuffer+pbufferlen, buffer, size);
         pbufferlen += size;
         return size;
@@ -68,7 +68,7 @@ size_t BC95UDP::write(uint8_t byte) {
 }
 
 size_t BC95UDP::write(const __FlashStringHelper *buffer, size_t size) {
-    if (pbufferlen + size <= MAX_UDP_PAYLOAD_SIZE) {
+    if (pbufferlen + size <= BC95UDP_MAX_PAYLOAD_SIZE) {
         memcpy_P(pbuffer+pbufferlen, buffer, size);
         pbufferlen += size;
         return size;
@@ -90,11 +90,11 @@ int BC95UDP::parsePacket() {
     if (pbufferlen > 0) return pbufferlen;
 
     pbufferlen = 0;
-    memset(pbuffer, 0, MAX_UDP_PAYLOAD_SIZE);
+    memset(pbuffer, 0, BC95UDP_MAX_PAYLOAD_SIZE);
     q = pbuffer;
     do {
         len = 0;
-        char *msg = _bc95->fetchSocketPacket(socket, SERIAL_READ_CHUNK_SIZE);
+        char *msg = _bc95->fetchSocketPacket(socket, BC95UDP_SERIAL_READ_CHUNK_SIZE);
 
         if (msg == NULL) {
             break;
@@ -168,7 +168,7 @@ int BC95UDP::peek() {
 
 void BC95UDP::flush() {
     if (pbufferlen > 0) {
-        memset(pbuffer, 0, MAX_UDP_PAYLOAD_SIZE);
+        memset(pbuffer, 0, BC95UDP_MAX_PAYLOAD_SIZE);
         pbufferlen = 0;
     }
 }
@@ -179,4 +179,8 @@ IPAddress BC95UDP::remoteIP() {
 
 uint16_t BC95UDP::remotePort() {
     return dport;
+}
+
+uint8_t* BC95UDP::getInternalBuffer() {
+    return pbuffer;
 }

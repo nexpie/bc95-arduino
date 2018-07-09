@@ -22,7 +22,6 @@ public:
     virtual void stop();
     virtual int beginPacket(IPAddress ip, uint16_t port);
     virtual int beginPacket(const char *host, uint16_t port);
-
     virtual int endPacket();
 
     virtual size_t write(uint8_t);
@@ -40,6 +39,7 @@ public:
     virtual IPAddress remoteIP();
     virtual uint16_t remotePort();
 
+    uint8_t* getInternalBuffer();
 private:
     BC95Class *_bc95;
     IPAddress dip;

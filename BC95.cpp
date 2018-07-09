@@ -9,7 +9,7 @@ This software is released under the MIT License.
 
 #include "BC95.h"
 
-char buffer[MAX_BC95_BUFFER_SIZE];
+char buffer[BC95_MAX_BUFFER_SIZE];
 const char STOPPER[][STOPPERLEN] = {END_LINE, END_OK, END_ERROR};
 
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
@@ -35,12 +35,12 @@ char* BC95Class::fetchSocketPacket(SOCKD *socket, uint16_t len) {
 
 // return a null-terminated response text from AT-command
 char* BC95Class::getSerialResponse(char *prefix) {
-    return getSerialResponse(prefix, DEFAULT_SERIAL_TIMEOUT);
+    return getSerialResponse(prefix, BC95_DEFAULT_SERIAL_TIMEOUT);
 }
 
 char* BC95Class::getSerialResponse(char *prefix, uint32_t timeout) {
 
-    if (readUntilDone(buffer, timeout, MAX_BC95_BUFFER_SIZE) >= 0) {
+    if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {
         char *p,*r;
         uint8_t sno;
         size_t plen;
@@ -61,7 +61,7 @@ char* BC95Class::getSerialResponse(char *prefix, uint32_t timeout) {
                 socketpool[sno].bc95_msglen = plen;
 
             // if +NSONMI is unexpectly found, read serial again
-            if (readUntilDone(buffer, timeout, MAX_BC95_BUFFER_SIZE) >= 0) {   // 0
+            if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {   // 0
                 return parseResponse(buffer, prefix);
             }
             else {
@@ -179,6 +179,7 @@ char* BC95Class::getIMSI() {
     return getSerialResponse("\x0D\x0A");
 }
 
+/* This function needs BC95_MAX_BUFFER_SIZE > 200 */
 char* BC95Class::getManufacturerModel() {
     cmdPrintln(F("AT+CGMM"));
     return getSerialResponse("\x0D\x0A");
@@ -192,6 +193,18 @@ char* BC95Class::getManufacturerRevision() {
 char* BC95Class::getIPAddress() {
     cmdPrintln(F("AT+CGPADDR=0"));
     return getSerialResponse("+CGPADDR:0,");
+}
+
+int8_t BC95Class::getSignalStrength() {
+    char *p;
+    int8_t r = 0;
+    cmdPrintln(F("AT+CSQ"));
+    p = getSerialResponse("+CSQ:");
+    if (*p>='0' && *p<='9') r=*p-'0';
+    else return -1;
+    p++;
+    if (*p>='0' && *p<='9') r=10*r+*p-'0';
+    return 2*r-113;
 }
 
 SOCKD* BC95Class::createSocket(uint16_t port){

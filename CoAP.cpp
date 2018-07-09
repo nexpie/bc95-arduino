@@ -251,7 +251,7 @@ bool Coap::loop() {
 
         if (packet.type == COAP_ACK) {
             // call response function
-            #if ENABLE_COAP_ACK_CALLBACK == 1
+            #if COAP_ENABLE_ACK_CALLBACK == 1
                 if (resp != NULL)
                     resp(packet, _udp->remoteIP(), _udp->remotePort());
             #endif

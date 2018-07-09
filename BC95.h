@@ -13,7 +13,7 @@ This software is released under the MIT License.
 #include <Arduino.h>
 #include <IPAddress.h>
 
-#if BC95_DEBUG == 1
+#if BC95_PRINT_DEBUG == 1
 #define ECHO_DEBUG
 #define LOG_DEBUG
 #endif
@@ -80,6 +80,7 @@ public:
     char* getIMEI();
     char* getIMEI(char *);
     char* getIMSI();
+    int8_t getSignalStrength();
     char* getManufacturerModel();
     char* getManufacturerRevision();
 

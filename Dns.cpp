@@ -55,7 +55,7 @@
 #define ntohl(x) htonl(x)
 
 void DNSClient::begin() {
-    begin(DEFAULT_DNS_SERVER);
+    begin(DNS_DEFAULT_SERVER);
 }
 
 void DNSClient::begin(const IPAddress& aDNSServer) {
