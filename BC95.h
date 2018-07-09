@@ -92,7 +92,6 @@ public:
     int sendPacket(SOCKD* socket, IPAddress, uint16_t destPort, uint8_t *payload, size_t);
     char* fetchSocketPacket(SOCKD *socket, uint16_t len);
     void closeSocket(SOCKD *socket);
-    static uint8_t hextodec(char x);
 
 private:
     Stream* BC95Serial;

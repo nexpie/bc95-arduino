@@ -197,13 +197,13 @@ char* BC95Class::getIPAddress() {
 
 int8_t BC95Class::getSignalStrength() {
     char *p;
-    int8_t r = 0;
+    int8_t r = 0, i;
     cmdPrintln(F("AT+CSQ"));
     p = getSerialResponse("+CSQ:");
-    if (*p>='0' && *p<='9') r=*p-'0';
-    else return -1;
-    p++;
-    if (*p>='0' && *p<='9') r=10*r+*p-'0';
+    for (i=0; i<2; i++) {
+        if (*p>='0' && *p<='9') r=10*r + *p-'0';
+        p++;
+    }
     return 2*r-113;
 }
 
