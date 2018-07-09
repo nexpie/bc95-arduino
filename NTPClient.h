@@ -12,7 +12,7 @@ class NTPClient {
     BC95UDP*          _udp;
     bool          _udpSetup       = false;
 
-    const char*   _poolServerName = "pool.ntp.org";
+    const char*   _poolServerName = NTP_DEFAULT_SERVER;
     int           _port           = NTP_DEFAULT_LOCAL_PORT;
     long          _timeOffset     = 0;
 

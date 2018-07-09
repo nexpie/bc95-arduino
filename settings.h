@@ -20,6 +20,8 @@ This software is released under the MIT License.
 #define DNS_MAX_RETRY                   5
 #define DNS_DEFAULT_SERVER              IPAddress(8,8,8,8)
 
+#define NTP_DEFAULT_SERVER              "time.nist.gov"
+
 #define COAP_ENABLE_ACK_CALLBACK        0
 
 #endif
