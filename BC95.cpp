@@ -6,7 +6,6 @@ E-mail: chavee@nexpie.com
 This software is released under the MIT License.
 */
 
-
 #include "BC95.h"
 
 char buffer[BC95_MAX_BUFFER_SIZE];
@@ -61,7 +60,7 @@ char* BC95Class::getSerialResponse(char *prefix, uint32_t timeout) {
                 socketpool[sno].bc95_msglen = plen;
 
             // if +NSONMI is unexpectly found, read serial again
-            if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {   // 0
+            if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {
                 return parseResponse(buffer, prefix);
             }
             else {
@@ -89,7 +88,7 @@ char* BC95Class::parseResponse(char *rawstr, char* pref) {
     if (pref==NULL || *pref=='\0') {
         return rawstr;
     }
-	p = strstr((const char *)rawstr, (const char *)pref);
+    p = strstr((const char *)rawstr, (const char *)pref);
     if (p != NULL) {
 		p += strlen(pref);
         // skip STOPPER[0]
