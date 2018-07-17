@@ -75,6 +75,11 @@ struct SOCKD {
 class BC95Class {
 public:
     BC95();
+
+    #if BC95_USE_EXTERNAL_BUFFER == 1
+    void BC95Class::setExternalBuffer(char *sbuffer, size_t sbuffersize);
+    #endif
+
     SOCKD socketpool[MAXSOCKET];
     void begin(Stream &);
     char* getIMEI();
@@ -92,6 +97,8 @@ public:
     int sendPacket(SOCKD* socket, IPAddress, uint16_t destPort, uint8_t *payload, size_t);
     char* fetchSocketPacket(SOCKD *socket, uint16_t len);
     void closeSocket(SOCKD *socket);
+
+    uint8_t* getBuffer();
 
 private:
     Stream* BC95Serial;

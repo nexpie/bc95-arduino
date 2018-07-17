@@ -8,11 +8,25 @@ This software is released under the MIT License.
 
 #include "BC95.h"
 
-char buffer[BC95_MAX_BUFFER_SIZE];
+#if BC95_USE_EXTERNAL_BUFFER == 1
+    char *buffer = NULL;
+    size_t buffersize = 0;
+#else
+    char buffer[BC95_BUFFER_SIZE];
+    #define buffersize BC95_BUFFER_SIZE
+#endif
+
 const char STOPPER[][STOPPERLEN] = {END_LINE, END_OK, END_ERROR};
 
 #define COUNT_OF(x) ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 #define STOPPERCOUNT COUNT_OF(STOPPER)
+
+#if BC95_USE_EXTERNAL_BUFFER == 1
+void BC95Class::setExternalBuffer(char *sbuffer, size_t sbuffersize) {
+    buffer = sbuffer;
+    buffersize = sbuffersize;
+}
+#endif
 
 void BC95Class::begin(Stream &serial) {
     BC95Serial = &serial;
@@ -39,7 +53,7 @@ char* BC95Class::getSerialResponse(char *prefix) {
 
 char* BC95Class::getSerialResponse(char *prefix, uint32_t timeout) {
 
-    if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {
+    if (readUntilDone(buffer, timeout, buffersize) >= 0) {
         char *p,*r;
         uint8_t sno;
         size_t plen;
@@ -60,7 +74,7 @@ char* BC95Class::getSerialResponse(char *prefix, uint32_t timeout) {
                 socketpool[sno].bc95_msglen = plen;
 
             // if +NSONMI is unexpectly found, read serial again
-            if (readUntilDone(buffer, timeout, BC95_MAX_BUFFER_SIZE) >= 0) {
+            if (readUntilDone(buffer, timeout, buffersize) >= 0) {
                 return parseResponse(buffer, prefix);
             }
             else {
@@ -178,7 +192,7 @@ char* BC95Class::getIMSI() {
     return getSerialResponse("\x0D\x0A");
 }
 
-/* This function needs BC95_MAX_BUFFER_SIZE > 200 */
+/* This function needs BC95_BUFFER_SIZE > 200 */
 char* BC95Class::getManufacturerModel() {
     cmdPrintln(F("AT+CGMM"));
     return getSerialResponse("\x0D\x0A");
@@ -255,6 +269,10 @@ void BC95Class::closeSocket(SOCKD *socket) {
     cmdPrintln(socket->sockid);
     getSerialResponse("");
     socketpool[socket->sockid].status = 0;
+}
+
+uint8_t* getBuffer() {
+    return (uint8_t *)buffer;
 }
 
 #if !defined NO_GLOBAL_INSTANCES && !defined NO_GLOBAL_BC95

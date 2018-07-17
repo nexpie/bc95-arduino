@@ -13,13 +13,17 @@ This software is released under the MIT License.
 #include "BC95Udp.h"
 
 #if BC95UDP_SHARE_GLOBAL_BUFFER != 1
-uint8_t pbuffer[BC95UDP_MAX_PAYLOAD_SIZE];
+uint8_t pbuffer[BC95UDP_BUFFER_SIZE];
 uint16_t pbufferlen;
 #endif
 
 BC95UDP::BC95UDP() {
     _bc95 = &BC95;
     pbufferlen = 0;
+
+    #if BC95_USE_EXTERNAL_BUFFER == 1
+    _bc95->setExternalBuffer(pbuffer, BC95UDP_BUFFER_SIZE);
+    #endif
 }
 
 uint8_t BC95UDP::begin(uint16_t port) {
@@ -54,7 +58,7 @@ int BC95UDP::beginPacket(IPAddress ip, uint16_t port) {
 }
 
 size_t BC95UDP::write(const uint8_t *buffer, size_t size) {
-    if (pbufferlen + size <= BC95UDP_MAX_PAYLOAD_SIZE) {
+    if (pbufferlen + size <= BC95UDP_BUFFER_SIZE) {
         memcpy(pbuffer+pbufferlen, buffer, size);
         pbufferlen += size;
         return size;
@@ -68,7 +72,7 @@ size_t BC95UDP::write(uint8_t byte) {
 }
 
 size_t BC95UDP::write(const __FlashStringHelper *buffer, size_t size) {
-    if (pbufferlen + size <= BC95UDP_MAX_PAYLOAD_SIZE) {
+    if (pbufferlen + size <= BC95UDP_BUFFER_SIZE) {
         memcpy_P(pbuffer+pbufferlen, buffer, size);
         pbufferlen += size;
         return size;
@@ -90,10 +94,14 @@ int BC95UDP::parsePacket() {
     if (pbufferlen > 0) return pbufferlen;
 
     pbufferlen = 0;
-    memset(pbuffer, 0, BC95UDP_MAX_PAYLOAD_SIZE);
+    memset(pbuffer, 0, BC95UDP_BUFFER_SIZE);
     q = pbuffer;
     do {
         len = 0;
+        #if BC95_USE_EXTERNAL_BUFFER == 1
+        _bc95->setExternalBuffer(q, BC95UDP_BUFFER_SIZE-(q-pbuffer));
+        #endif
+
         char *msg = _bc95->fetchSocketPacket(socket, BC95UDP_SERIAL_READ_CHUNK_SIZE);
 
         if (msg == NULL) {
@@ -168,7 +176,7 @@ int BC95UDP::peek() {
 
 void BC95UDP::flush() {
     if (pbufferlen > 0) {
-        memset(pbuffer, 0, BC95UDP_MAX_PAYLOAD_SIZE);
+        memset(pbuffer, 0, BC95UDP_BUFFER_SIZE);
         pbufferlen = 0;
     }
 }
