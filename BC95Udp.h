@@ -39,15 +39,17 @@ public:
     virtual IPAddress remoteIP();
     virtual uint16_t remotePort();
 
-    uint8_t* getInternalBuffer();
+    #if BC95UDP_USE_EXTERNAL_BUFFER == 1
+    void setExternalBuffer(uint8_t *sbuffer, size_t sbuffersize);
+    #endif
 private:
     BC95Class *_bc95;
     IPAddress dip;
     uint16_t dport;
     SOCKD *socket;
     uint8_t *pktcur;
-    #if BC95UDP_SHARE_GLOBAL_BUFFER == 1
-    uint8_t pbuffer[MAX_UDP_PAYLOAD_SIZE];
+    #if BC95UDP_SHARE_GLOBAL_BUFFER == 0
+    uint8_t pbuffer[BC95UDP_BUFFER_SIZE];
     uint16_t pbufferlen;
     #endif
 };

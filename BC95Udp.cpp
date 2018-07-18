@@ -12,8 +12,14 @@ This software is released under the MIT License.
 #include "BC95.h"
 #include "BC95Udp.h"
 
-#if BC95UDP_SHARE_GLOBAL_BUFFER != 1
+#if BC95UDP_SHARE_GLOBAL_BUFFER == 1
+#if BC95UDP_USE_EXTERNAL_BUFFER == 1
+uint8_t *pbuffer = NULL;
+size_t pbuffersize = 0;
+#else
 uint8_t pbuffer[BC95UDP_BUFFER_SIZE];
+#define pbuffersize BC95UDP_BUFFER_SIZE
+#endif
 uint16_t pbufferlen;
 #endif
 
@@ -25,6 +31,17 @@ BC95UDP::BC95UDP() {
     _bc95->setExternalBuffer(pbuffer, BC95UDP_BUFFER_SIZE);
     #endif
 }
+
+#if BC95UDP_USE_EXTERNAL_BUFFER == 1
+void BC95UDP::setExternalBuffer(uint8_t *sbuffer, size_t sbuffersize) {
+    pbuffer = sbuffer;
+    pbuffersize = sbuffersize;
+
+    #if BC95UDP_USE_EXTERNAL_BUFFER == 1
+    _bc95->setExternalBuffer((char *)sbuffer, sbuffersize);
+    #endif
+}
+#endif
 
 uint8_t BC95UDP::begin(uint16_t port) {
     socket = _bc95->createSocket(port);
@@ -187,8 +204,4 @@ IPAddress BC95UDP::remoteIP() {
 
 uint16_t BC95UDP::remotePort() {
     return dport;
-}
-
-uint8_t* BC95UDP::getInternalBuffer() {
-    return pbuffer;
 }
