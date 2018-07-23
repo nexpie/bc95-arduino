@@ -26,6 +26,6 @@ This software is released under the MIT License.
 
 #define NTP_DEFAULT_SERVER              "time.nist.gov"
 
-#define COAP_ENABLE_ACK_CALLBACK        0
+#define COAP_ENABLE_ACK_CALLBACK        1
 
 #endif
