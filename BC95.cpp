@@ -13,7 +13,7 @@ This software is released under the MIT License.
     size_t buffersize = 0;
 #else
     char buffer[BC95_BUFFER_SIZE];
-    #define buffersize BC95_BUFFER_SIZE
+    #define buffersize c
 #endif
 
 const char STOPPER[][STOPPERLEN] = {END_LINE, END_OK, END_ERROR};

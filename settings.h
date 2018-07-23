@@ -16,7 +16,7 @@ This software is released under the MIT License.
 #define BC95_DEFAULT_SERIAL_TIMEOUT     500
 #define BC95_BUFFER_SIZE                DATA_BUFFER_SIZE
 
-#define BC95UDP_USE_EXTERNAL_BUFFER    1
+#define BC95UDP_USE_EXTERNAL_BUFFER     1
 #define BC95UDP_SHARE_GLOBAL_BUFFER     1
 #define BC95UDP_SERIAL_READ_CHUNK_SIZE  7
 #define BC95UDP_BUFFER_SIZE             DATA_BUFFER_SIZE
