@@ -136,7 +136,6 @@ uint16_t Coap::send(char *host, int port, char *url, COAP_TYPE type, COAP_METHOD
 }
 
 uint16_t Coap::send(IPAddress ip, int port, char *url, COAP_TYPE type, COAP_METHOD method, uint8_t *token, uint8_t tokenlen, uint8_t *payload, uint32_t payloadlen) {
-
     // make packet
     CoapPacket packet;
 
@@ -225,7 +224,6 @@ int Coap::parseOption(CoapOption *option, uint16_t *running_delta, uint8_t **buf
 }
 
 bool Coap::loop() {
-
     uint8_t buffer[BUF_MAX_SIZE];
     int32_t packetlen = _udp->parsePacket();
 
@@ -276,11 +274,6 @@ bool Coap::loop() {
         }
 
         if (packet.type == COAP_ACK) {
-// Serial.println('COAP_ACK');
-// for (int i=0; i< packet.payloadlen; i++) {
-//     Serial.print(packet.payload[i], HEX);
-//     Serial.print(" ");
-// }
             // call response function
             #if COAP_ENABLE_ACK_CALLBACK == 1
                 if (resp != NULL)
