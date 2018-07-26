@@ -22,7 +22,7 @@ void setup() {
     Serial.println(F("NB-IOT attached.."));
 
     dns.begin();
-    dns.getHostByName("gogole.com", remoteip);
+    dns.getHostByName("google.com", remoteip);
 
     Serial.print("The resolved IP address is : ");
     Serial.println(remoteip);
