@@ -12,7 +12,7 @@ void responseHandler(CoapPacket *packet, IPAddress remoteIP, int remotePort) {
     char buff[6];
 
     Serial.print("CoAP Response Code: ");
-    sprintf(buff, "%d.%02d \n", packet->code >> 5, packet->code & 0b00011111);
+    sprintf(buff, "%d.%02d\n", packet->code >> 5, packet->code & 0b00011111);
     Serial.print(buff);
 
     for (int i=0; i< packet->payloadlen; i++) {
