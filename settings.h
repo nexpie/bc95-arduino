@@ -9,7 +9,7 @@ This software is released under the MIT License.
 #ifndef SETTINGS_h
 #define SETTINGS_h
 
-#define DATA_BUFFER_SIZE                128
+#define DATA_BUFFER_SIZE                150
 
 #define BC95_USE_EXTERNAL_BUFFER        1
 #define BC95_PRINT_DEBUG                0
@@ -21,6 +21,8 @@ This software is released under the MIT License.
 #define BC95UDP_SERIAL_READ_CHUNK_SIZE  7
 #define BC95UDP_BUFFER_SIZE             DATA_BUFFER_SIZE
 
+#define DNS_CACHE_SLOT                  1
+#define DNS_CACHE_SIZE                  24
 #define DNS_MAX_RETRY                   5
 #define DNS_DEFAULT_SERVER              IPAddress(8,8,8,8)
 

@@ -54,6 +54,12 @@
                    ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
 
+static uint8_t current_dns_slot = 0;
+static dns_cache_struct dnscache[DNS_CACHE_SLOT] = {0};
+
+DNSClient::DNSClient() {
+}
+
 void DNSClient::begin() {
     begin(DNS_DEFAULT_SERVER);
 }
@@ -120,6 +126,13 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
         return 1;
     }
 
+    for (uint8_t i=0 ; i<DNS_CACHE_SLOT; i++) {
+        if (strcmp(dnscache[current_dns_slot].domain, aHostname)==0) {
+            aResult = dnscache[current_dns_slot].ip;
+            return 1;
+        }
+    }
+
     do {
         iUdp.begin(8053);
         int retries = 0;
@@ -147,6 +160,10 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
         iUdp.stop();
 
     } while (ret!=1 && times<DNS_MAX_RETRY);
+
+    if (ret) {
+        insertDNSCache(aHostname, aResult);
+    }
 
     return ret;
 }
@@ -374,4 +391,12 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress) {
 
     // If we get here then we haven't found an answer
     return -10;//INVALID_RESPONSE;
+}
+
+void DNSClient::insertDNSCache(char* domain, IPAddress ip) {
+    if (strlen(domain) < DNS_CACHE_SIZE) {
+        strcpy(dnscache[current_dns_slot].domain, domain);
+        dnscache[current_dns_slot].ip = ip;
+        current_dns_slot = (current_dns_slot+1) % DNS_CACHE_SLOT;
+    }
 }

@@ -123,7 +123,7 @@ uint16_t Coap::put(char *host, int port, char *url, char *payload, int payloadle
 }
 
 uint16_t Coap::send(char *host, int port, char *url, COAP_TYPE type, COAP_METHOD method, uint8_t *token, uint8_t tokenlen, uint8_t *payload, uint32_t payloadlen) {
-    int ret = 0;
+    int ret;
     DNSClient *dns;
     IPAddress remote_addr;
 
@@ -131,6 +131,7 @@ uint16_t Coap::send(char *host, int port, char *url, COAP_TYPE type, COAP_METHOD
     dns->begin();
     ret = dns->getHostByName(host, remote_addr);
     delete dns;
+    if (!ret) return 0;
 
     return this->send(remote_addr, port, url, type, method, token, tokenlen, payload, payloadlen);
 }

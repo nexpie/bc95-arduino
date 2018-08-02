@@ -14,8 +14,16 @@
 #include "BC95Udp.h"
 #include "Arduino.h"
 
+struct DNS_CACHE_STRUCT {
+    char domain[DNS_CACHE_SIZE];
+    IPAddress ip;
+};
+
+typedef struct DNS_CACHE_STRUCT dns_cache_struct;
+
 class DNSClient {
 public:
+    DNSClient();
     void begin ();
     void begin(const IPAddress& aDNSServer);
 
@@ -38,6 +46,7 @@ public:
 protected:
     uint16_t BuildRequest(const char* aName);
     uint16_t ProcessResponse(uint16_t aTimeout, IPAddress& aAddress);
+    void insertDNSCache(char* domain, IPAddress ip);
 
     IPAddress iDNSServer;
     uint16_t iRequestId;
