@@ -14,12 +14,13 @@
 #include "BC95Udp.h"
 #include "Arduino.h"
 
+#if DNS_CACHE_SLOT > 0
 struct DNS_CACHE_STRUCT {
     char domain[DNS_CACHE_SIZE];
     IPAddress ip;
 };
-
 typedef struct DNS_CACHE_STRUCT dns_cache_struct;
+#endif
 
 class DNSClient {
 public:
@@ -46,7 +47,10 @@ public:
 protected:
     uint16_t BuildRequest(const char* aName);
     uint16_t ProcessResponse(uint16_t aTimeout, IPAddress& aAddress);
+
+    #if DNS_CACHE_SLOT > 0
     void insertDNSCache(char* domain, IPAddress ip);
+    #endif
 
     IPAddress iDNSServer;
     uint16_t iRequestId;
