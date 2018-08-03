@@ -281,6 +281,7 @@ bool Coap::loop() {
                     resp(packet, _udp->remoteIP(), _udp->remotePort());
             #endif
         } else {
+            // e.g. packet.type == COAP_CON
 
             String url = "";
             // call endpoint url function
@@ -300,15 +301,11 @@ bool Coap::loop() {
                         COAP_NOT_FOUNT, COAP_NONE, NULL, 0);
             } else {
                 uri.find(url)(packet, _udp->remoteIP(), _udp->remotePort());
+
+                // ack here?
+                // sendResponse(_udp->remoteIP(), _udp->remotePort(), packet.messageid);
             }
         }
-
-        /* this type check did not use.
-        if (packet.type == COAP_CON) {
-            // send response
-             sendResponse(_udp->remoteIP(), _udp->remotePort(), packet.messageid);
-        }
-         */
 
         // next packet
         packetlen = _udp->parsePacket();

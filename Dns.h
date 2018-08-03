@@ -50,6 +50,7 @@ protected:
 
     #if DNS_CACHE_SLOT > 0
     void insertDNSCache(char* domain, IPAddress ip);
+    void clearDNSCache();
     #endif
 
     IPAddress iDNSServer;

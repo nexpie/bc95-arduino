@@ -54,8 +54,10 @@
                    ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
 
-
 #if DNS_CACHE_SLOT > 0
+    #if DNS_CACHE_EXPIRE_MS > 0
+    unsigned long dns_expire_timestamp = 0;
+    #endif
     static uint8_t current_dns_slot = 0;
     static dns_cache_struct dnscache[DNS_CACHE_SLOT] = {0};
 #endif
@@ -130,6 +132,13 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
     }
 
     #if DNS_CACHE_SLOT > 0
+
+        #if DNS_CACHE_EXPIRE_MS > 0
+            if (millis() > dns_expire_timestamp) {
+                clearDNSCache();
+            }
+        #endif
+
         for (uint8_t i=0 ; i<DNS_CACHE_SLOT; i++) {
             if (strcmp(dnscache[current_dns_slot].domain, aHostname)==0) {
                 aResult = dnscache[current_dns_slot].ip;
@@ -169,6 +178,9 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
     #if DNS_CACHE_SLOT > 0
         if (ret) {
             insertDNSCache(aHostname, aResult);
+            #if DNS_CACHE_EXPIRE_MS > 0
+                dns_expire_timestamp = millis() + DNS_CACHE_EXPIRE_MS;
+            #endif
         }
     #endif
 
@@ -408,4 +420,12 @@ void DNSClient::insertDNSCache(char* domain, IPAddress ip) {
         current_dns_slot = (current_dns_slot+1) % DNS_CACHE_SLOT;
     }
 }
+
+void DNSClient::clearDNSCache() {
+    for (uint8_t i; i<DNS_CACHE_SLOT; i++) {
+        dnscache[i].domain[0] = '\0';
+    }
+    current_dns_slot = 0;
+}
+
 #endif
