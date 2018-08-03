@@ -10,7 +10,7 @@ Arduino : UNO, MEGA2560
 NB-IOT shield/module : True NB-IOT shield, AIS NB-IOT shield, Quectel BC95-B8
 
 **คำแนะนำ**
-สามารถปรับแต่งค่า config ต่างๆในไฟล์ settings.h ได้ เช่น ขนาด buffer, เลือกให้ใช้ buffer จากภายนอก หรือให้ library ทำการ allocate memory ขึ้นมาเอง, การตั้งค่า default dns และ time server เป็นต้น 
+สามารถปรับแต่งค่า config ต่างๆในไฟล์ settings.h ได้ เช่น ขนาด buffer, เลือกให้ใช้ buffer จากภายนอก หรือให้ library ทำการ allocate memory ขึ้นมาเอง, การตั้งค่า time server และค่าเกี่ยวกับ DNS เป็นต้น 
 
 ```
 #define DATA_BUFFER_SIZE                128
@@ -25,6 +25,9 @@ NB-IOT shield/module : True NB-IOT shield, AIS NB-IOT shield, Quectel BC95-B8
 #define BC95UDP_SERIAL_READ_CHUNK_SIZE  7
 #define BC95UDP_BUFFER_SIZE             DATA_BUFFER_SIZE
 
+#define DNS_CACHE_SLOT                  1
+#define DNS_CACHE_SIZE                  24
+#define DNS_CACHE_EXPIRE_MS             0
 #define DNS_MAX_RETRY                   5
 #define DNS_DEFAULT_SERVER              IPAddress(8,8,8,8)
 
