@@ -1,4 +1,5 @@
-#include "coap.h"
+#include "Dns.h"
+#include "CoAP.h"
 #include "Arduino.h"
 
 #define LOGGING
@@ -101,6 +102,10 @@ uint16_t Coap::get(IPAddress ip, int port, char *url) {
     return this->send(ip, port, url, COAP_CON, COAP_GET, NULL, 0, NULL, 0);
 }
 
+uint16_t Coap::get(char *host, int port, char *url) {
+    return this->send(host, port, url, COAP_CON, COAP_GET, NULL, 0, NULL, 0);
+}
+
 uint16_t Coap::put(IPAddress ip, int port, char *url, char *payload) {
     return this->send(ip, port, url, COAP_CON, COAP_PUT, NULL, 0, (uint8_t *)payload, strlen(payload));
 }
@@ -109,8 +114,29 @@ uint16_t Coap::put(IPAddress ip, int port, char *url, char *payload, int payload
     return this->send(ip, port, url, COAP_CON, COAP_PUT, NULL, 0, (uint8_t *)payload, payloadlen);
 }
 
-uint16_t Coap::send(IPAddress ip, int port, char *url, COAP_TYPE type, COAP_METHOD method, uint8_t *token, uint8_t tokenlen, uint8_t *payload, uint32_t payloadlen) {
+uint16_t Coap::put(char *host, int port, char *url, char *payload) {
+    return this->send(host, port, url, COAP_CON, COAP_PUT, NULL, 0, (uint8_t *)payload, strlen(payload));
+}
 
+uint16_t Coap::put(char *host, int port, char *url, char *payload, int payloadlen) {
+    return this->send(host, port, url, COAP_CON, COAP_PUT, NULL, 0, (uint8_t *)payload, payloadlen);
+}
+
+uint16_t Coap::send(char *host, int port, char *url, COAP_TYPE type, COAP_METHOD method, uint8_t *token, uint8_t tokenlen, uint8_t *payload, uint32_t payloadlen) {
+    int ret;
+    DNSClient *dns;
+    IPAddress remote_addr;
+
+    dns = new DNSClient();
+    dns->begin();
+    ret = dns->getHostByName(host, remote_addr);
+    delete dns;
+    if (!ret) return 0;
+
+    return this->send(remote_addr, port, url, type, method, token, tokenlen, payload, payloadlen);
+}
+
+uint16_t Coap::send(IPAddress ip, int port, char *url, COAP_TYPE type, COAP_METHOD method, uint8_t *token, uint8_t tokenlen, uint8_t *payload, uint32_t payloadlen) {
     // make packet
     CoapPacket packet;
 
@@ -199,7 +225,6 @@ int Coap::parseOption(CoapOption *option, uint16_t *running_delta, uint8_t **buf
 }
 
 bool Coap::loop() {
-
     uint8_t buffer[BUF_MAX_SIZE];
     int32_t packetlen = _udp->parsePacket();
 
@@ -256,6 +281,7 @@ bool Coap::loop() {
                     resp(packet, _udp->remoteIP(), _udp->remotePort());
             #endif
         } else {
+            // e.g. packet.type == COAP_CON
 
             String url = "";
             // call endpoint url function
@@ -275,15 +301,11 @@ bool Coap::loop() {
                         COAP_NOT_FOUNT, COAP_NONE, NULL, 0);
             } else {
                 uri.find(url)(packet, _udp->remoteIP(), _udp->remotePort());
+
+                // ack here?
+                // sendResponse(_udp->remoteIP(), _udp->remotePort(), packet.messageid);
             }
         }
-
-        /* this type check did not use.
-        if (packet.type == COAP_CON) {
-            // send response
-             sendResponse(_udp->remoteIP(), _udp->remotePort(), packet.messageid);
-        }
-         */
 
         // next packet
         packetlen = _udp->parsePacket();

@@ -54,6 +54,17 @@
                    ((x)>>24 & 0x000000FFUL) )
 #define ntohl(x) htonl(x)
 
+#if DNS_CACHE_SLOT > 0
+    #if DNS_CACHE_EXPIRE_MS > 0
+    unsigned long dns_expire_timestamp = 0;
+    #endif
+    static uint8_t current_dns_slot = 0;
+    static dns_cache_struct dnscache[DNS_CACHE_SLOT] = {0};
+#endif
+
+DNSClient::DNSClient() {
+}
+
 void DNSClient::begin() {
     begin(DNS_DEFAULT_SERVER);
 }
@@ -120,6 +131,22 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
         return 1;
     }
 
+    #if DNS_CACHE_SLOT > 0
+
+        #if DNS_CACHE_EXPIRE_MS > 0
+            if (millis() > dns_expire_timestamp) {
+                clearDNSCache();
+            }
+        #endif
+
+        for (uint8_t i=0 ; i<DNS_CACHE_SLOT; i++) {
+            if (strcmp(dnscache[current_dns_slot].domain, aHostname)==0) {
+                aResult = dnscache[current_dns_slot].ip;
+                return 1;
+            }
+        }
+    #endif
+
     do {
         iUdp.begin(8053);
         int retries = 0;
@@ -147,6 +174,15 @@ int DNSClient::getHostByName(const char* aHostname, IPAddress& aResult) {
         iUdp.stop();
 
     } while (ret!=1 && times<DNS_MAX_RETRY);
+
+    #if DNS_CACHE_SLOT > 0
+        if (ret) {
+            insertDNSCache(aHostname, aResult);
+            #if DNS_CACHE_EXPIRE_MS > 0
+                dns_expire_timestamp = millis() + DNS_CACHE_EXPIRE_MS;
+            #endif
+        }
+    #endif
 
     return ret;
 }
@@ -375,3 +411,21 @@ uint16_t DNSClient::ProcessResponse(uint16_t aTimeout, IPAddress& aAddress) {
     // If we get here then we haven't found an answer
     return -10;//INVALID_RESPONSE;
 }
+
+#if DNS_CACHE_SLOT > 0
+void DNSClient::insertDNSCache(char* domain, IPAddress ip) {
+    if (strlen(domain) < DNS_CACHE_SIZE) {
+        strcpy(dnscache[current_dns_slot].domain, domain);
+        dnscache[current_dns_slot].ip = ip;
+        current_dns_slot = (current_dns_slot+1) % DNS_CACHE_SLOT;
+    }
+}
+
+void DNSClient::clearDNSCache() {
+    for (uint8_t i; i<DNS_CACHE_SLOT; i++) {
+        dnscache[i].domain[0] = '\0';
+    }
+    current_dns_slot = 0;
+}
+
+#endif
