@@ -182,6 +182,11 @@ bool BC95Class::attachNetwork() {
   return getSerialResponse("+CGATT:1");
 }
 
+bool BC95Class::isAttached() {
+  cmdPrintln(F("AT+CGATT?"));
+  return getSerialResponse("+CGATT:1");
+}
+
 char* BC95Class::getIMEI() {
     cmdPrintln(F("AT+CGSN=1"));
     return getSerialResponse("+CGSN:");

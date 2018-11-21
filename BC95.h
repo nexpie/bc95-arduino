@@ -90,6 +90,7 @@ public:
     char* getManufacturerRevision();
 
     bool attachNetwork();
+    bool isAttached();
     char* getIPAddress();
     SOCKD* createSocket(uint16_t);
     void reset();
