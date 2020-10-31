@@ -8,7 +8,7 @@ AltSoftSerial bc95serial;
 #define SERVER_IP     IPAddress(8, 8, 8, 8)
 #define SERVER_PORT   53
 
-// This binary string represents a UDP paylaod of the DNS query for the domain name nexpie.com
+// This binary string represents a UDP payload of the DNS query for the domain name nexpie.com
 uint8_t udpdata[] = "\xC0\x5B\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06\x6E\x65\x78\x70\x69\x65\x03\x63\x6F\x6D\x00\x00\x01\x00\x01";
 
 
